@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | VoiceFlow AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="auth-page">
+  <main class="auth-card">
+    <h1>Create your account</h1>
+    {% if error %}<p class="error-text">{{ error }}</p>{% endif %}
+    <form method="POST">
+      <label>Email</label>
+      <input type="email" name="email" required />
+      <label>Password</label>
+      <input type="password" name="password" minlength="6" required />
+      <p class="muted">New accounts start on the Free plan. Upgrade anytime from dashboard billing.</p>
+      <button type="submit" class="btn">Create account</button>
+    </form>
+    <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+  </main>
+</body>
+</html>

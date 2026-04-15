@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VoiceFlow AI – Smart Voice Intelligence Platform</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <div class="hero">
+    <nav class="top-nav">
+      <div class="logo">VoiceFlow AI</div>
+      <div>
+        <a href="{{ url_for('login') }}" class="nav-link">Login</a>
+        <a href="{{ url_for('signup') }}" class="btn small">Start Free</a>
+      </div>
+    </nav>
+
+    <section class="hero-content">
+      <h1>Turn Voice into Actionable Intelligence</h1>
+      <p>
+        Transcribe meetings, summarize key moments, extract tasks and keywords,
+        and unlock multilingual voice insights in English + Hindi.
+      </p>
+      <a href="{{ url_for('signup') }}" class="btn">Start Free</a>
+    </section>
+  </div>
+
+  <section class="plans">
+    <h2>Pricing Plans</h2>
+    <div class="plan-grid">
+      <div class="card">
+        <h3>Free</h3>
+        <p>{{ plan_pricing['free'] }}</p>
+        <ul>
+          <li>10 mins/day transcription</li>
+          <li>Speech-to-text only</li>
+          <li>Single user dashboard</li>
+        </ul>
+      </div>
+      <div class="card featured">
+        <h3>Pro</h3>
+        <p>{{ plan_pricing['pro'] }}</p>
+        <ul>
+          <li>Unlimited transcription</li>
+          <li>AI summaries + keywords</li>
+          <li>TXT transcript downloads</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Business</h3>
+        <p>{{ plan_pricing['business'] }}</p>
+        <ul>
+          <li>All Pro features</li>
+          <li>API access</li>
+          <li>Bulk upload endpoint</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
