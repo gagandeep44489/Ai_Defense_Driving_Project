@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | VoiceFlow AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+  <header class="dashboard-top">
+    <div>
+      <h1>VoiceFlow AI Dashboard</h1>
+      <p>Plan: <strong>{{ user.plan|capitalize }}</strong>{% if remaining_seconds is not none %} | Free minutes left today: <strong>{{ (remaining_seconds/60)|round(2) }}</strong>{% endif %}</p>
+    </div>
+    <div class="controls">
+      <button id="upgradeProBtn" class="btn small" type="button" {% if not has_stripe_config %}disabled{% endif %}>Upgrade to Pro</button>
+      <button id="upgradeBusinessBtn" class="btn small secondary" type="button" {% if not has_stripe_config %}disabled{% endif %}>Upgrade to Business</button>
+      <button id="manageBillingBtn" class="btn small secondary" type="button" {% if not has_stripe_config %}disabled{% endif %}>Manage Billing</button>
+      <a class="btn small" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+  </header>
+  {% if not has_stripe_config %}
+    <p class="banner-warning">Stripe billing is disabled. Set STRIPE_SECRET_KEY, STRIPE_PRICE_PRO, and STRIPE_PRICE_BUSINESS.</p>
+  {% endif %}
+
+  <main class="dashboard-grid">
+    <section class="panel">
+      <h2>Voice Intelligence Studio</h2>
+      <div class="controls">
+        <button id="recordBtn" class="btn" type="button">Record</button>
+        <label class="btn" for="audioFile">Upload</label>
+        <button id="historyBtn" class="btn secondary" type="button">View history</button>
+      </div>
+
+      <input id="audioFile" type="file" accept="audio/wav,.wav" hidden />
+      <label for="languageSelect">Transcription language</label>
+      <select id="languageSelect">
+        <option value="en-IN">English</option>
+        <option value="hi-IN">Hindi</option>
+      </select>
+      <p id="status" class="status">Ready to transcribe.</p>
+
+      <h3>Transcript</h3>
+      <textarea id="transcriptOutput" rows="8" placeholder="Transcript will appear here"></textarea>
+
+      <div class="controls">
+        <button id="summarizeBtn" class="btn">Generate Summary</button>
+      </div>
+
+      <h3>Summary</h3>
+      <textarea id="summaryOutput" rows="5" placeholder="Summary will appear here"></textarea>
+
+      <h3>Keywords</h3>
+      <div id="keywordList" class="chips"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Recent Recordings</h2>
+      <div id="historyContainer" class="history-list"></div>
+    </section>
+  </main>
+
+  <script>
+    const recordBtn = document.getElementById('recordBtn');
+    const audioFile = document.getElementById('audioFile');
+    const historyBtn = document.getElementById('historyBtn');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const languageSelect = document.getElementById('languageSelect');
+    const statusEl = document.getElementById('status');
+    const transcriptOutput = document.getElementById('transcriptOutput');
+    const summaryOutput = document.getElementById('summaryOutput');
+    const keywordList = document.getElementById('keywordList');
+    const historyContainer = document.getElementById('historyContainer');
+    const manageBillingBtn = document.getElementById('manageBillingBtn');
+    const upgradeProBtn = document.getElementById('upgradeProBtn');
+    const upgradeBusinessBtn = document.getElementById('upgradeBusinessBtn');
+
+    let recorder;
+    let isRecording = false;
+    let chunks = [];
+    let lastTranscriptId = null;
+
+    const setStatus = (msg, error = false) => {
+      statusEl.textContent = msg;
+      statusEl.className = error ? 'status error-text' : 'status';
+    };
+
+    const renderKeywords = (keywords = []) => {
+      keywordList.innerHTML = '';
+      if (!keywords.length) {
+        keywordList.innerHTML = '<span class="muted">No keywords yet.</span>';
+        return;
+      }
+      keywords.forEach((word) => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.textContent = word;
+        keywordList.appendChild(chip);
+      });
+    };
+
+    async function transcribeAudio(blob, fileName = 'recording.wav') {
+      const formData = new FormData();
+      formData.append('audio', blob, fileName);
+      formData.append('language', languageSelect.value);
+
+      setStatus('Transcribing audio...');
+      try {
+        const response = await fetch('/api/transcribe', { method: 'POST', body: formData });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Transcription failed');
+
+        lastTranscriptId = data.id;
+        transcriptOutput.value = data.text || '';
+        summaryOutput.value = '';
+        renderKeywords(data.keywords || []);
+        setStatus(`Transcribed in ${data.duration_seconds}s`);
+        await loadHistory();
+      } catch (err) {
+        setStatus(err.message, true);
+      }
+    }
+
+    async function loadHistory() {
+      const res = await fetch('/api/history');
+      const data = await res.json();
+      historyContainer.innerHTML = '';
+
+      if (!data.history || !data.history.length) {
+        historyContainer.innerHTML = '<p class="muted">No transcripts yet.</p>';
+        return;
+      }
+
+      data.history.forEach((row) => {
+        const item = document.createElement('article');
+        item.className = 'history-item';
+        item.innerHTML = `
+          <h4>${row.filename}</h4>
+          <p><strong>${row.language}</strong> • ${row.duration_seconds}s • ${row.created_at}</p>
+          <p>${row.transcript_text.slice(0, 160)}...</p>
+          <div class="history-actions">
+            <button class="btn tiny" data-id="${row.id}" data-action="summary">Load</button>
+            <a class="btn tiny secondary" href="/download/${row.id}">Download TXT</a>
+          </div>
+        `;
+        historyContainer.appendChild(item);
+      });
+    }
+
+    historyContainer.addEventListener('click', async (event) => {
+      const button = event.target.closest('button[data-action="summary"]');
+      if (!button) return;
+
+      const id = button.dataset.id;
+      const response = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript_id: Number(id) }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setStatus(data.error || 'Unable to load summary.', true);
+        return;
+      }
+      summaryOutput.value = data.summary || '';
+      renderKeywords(data.keywords || []);
+      lastTranscriptId = Number(id);
+      setStatus('Summary loaded from history item.');
+    });
+
+    summarizeBtn.addEventListener('click', async () => {
+      const text = transcriptOutput.value.trim();
+      if (!text && !lastTranscriptId) {
+        setStatus('Please transcribe audio first.', true);
+        return;
+      }
+
+      const response = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lastTranscriptId ? { transcript_id: lastTranscriptId } : { text }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setStatus(data.error || 'Summarization failed.', true);
+        return;
+      }
+      summaryOutput.value = data.summary || '';
+      renderKeywords(data.keywords || []);
+      setStatus('Summary generated successfully.');
+      await loadHistory();
+    });
+
+    audioFile.addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      if (!file.name.toLowerCase().endsWith('.wav')) {
+        setStatus('Only WAV files are supported.', true);
+        return;
+      }
+      await transcribeAudio(file, file.name);
+    });
+
+    recordBtn.addEventListener('click', async () => {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setStatus('Microphone access unsupported by this browser.', true);
+        return;
+      }
+
+      if (!isRecording) {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          recorder = new MediaRecorder(stream);
+          chunks = [];
+
+          recorder.ondataavailable = (e) => {
+            if (e.data.size > 0) chunks.push(e.data);
+          };
+
+          recorder.onstop = async () => {
+            const webmBlob = new Blob(chunks, { type: 'audio/webm' });
+            const wavBlob = await convertWebmToWav(webmBlob);
+            stream.getTracks().forEach((track) => track.stop());
+            await transcribeAudio(wavBlob, 'recording.wav');
+          };
+
+          recorder.start();
+          isRecording = true;
+          recordBtn.textContent = 'Stop';
+          setStatus('Recording in progress...');
+        } catch {
+          setStatus('Unable to access microphone permissions.', true);
+        }
+      } else {
+        recorder.stop();
+        isRecording = false;
+        recordBtn.textContent = 'Record';
+      }
+    });
+
+    historyBtn.addEventListener('click', loadHistory);
+
+    async function createCheckout(plan) {
+      try {
+        const response = await fetch('/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ plan }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to create checkout session.');
+        window.location.href = data.url;
+      } catch (err) {
+        setStatus(err.message, true);
+      }
+    }
+
+    async function openBillingPortal() {
+      try {
+        const response = await fetch('/create-portal-session', { method: 'POST' });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to open billing portal.');
+        window.location.href = data.url;
+      } catch (err) {
+        setStatus(err.message, true);
+      }
+    }
+
+    upgradeProBtn.addEventListener('click', () => createCheckout('pro'));
+    upgradeBusinessBtn.addEventListener('click', () => createCheckout('business'));
+    manageBillingBtn.addEventListener('click', openBillingPortal);
+
+    async function convertWebmToWav(blob) {
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const arr = await blob.arrayBuffer();
+      const audioBuffer = await context.decodeAudioData(arr.slice(0));
+      const wavBuffer = audioBufferToWav(audioBuffer);
+      await context.close();
+      return new Blob([wavBuffer], { type: 'audio/wav' });
+    }
+
+    function audioBufferToWav(buffer) {
+      const channels = buffer.numberOfChannels;
+      const sampleRate = buffer.sampleRate;
+      const bytesPerSample = 2;
+      const samples = buffer.length;
+      const blockAlign = channels * bytesPerSample;
+      const dataSize = samples * blockAlign;
+      const output = new ArrayBuffer(44 + dataSize);
+      const view = new DataView(output);
+
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, 36 + dataSize, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, channels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * blockAlign, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, 16, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      let offset = 44;
+      const channelData = [...Array(channels)].map((_, i) => buffer.getChannelData(i));
+      for (let i = 0; i < samples; i++) {
+        for (let ch = 0; ch < channels; ch++) {
+          const sample = Math.max(-1, Math.min(1, channelData[ch][i]));
+          view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+          offset += 2;
+        }
+      }
+      return output;
+    }
+
+    function writeString(view, offset, value) {
+      for (let i = 0; i < value.length; i++) {
+        view.setUint8(offset + i, value.charCodeAt(i));
+      }
+    }
+
+    loadHistory();
+  </script>
+</body>
+</html>
