@@ -1,0 +1,12 @@
+fastapi==0.115.8
+uvicorn[standard]==0.34.0
+python-multipart==0.0.9
+pydantic==2.10.6
+pydantic-settings==2.7.1
+openai==1.61.1
+sqlalchemy==2.0.37
+psycopg2-binary==2.9.10
+faiss-cpu==1.10.0
+numpy==2.2.2
+python-json-logger==3.2.1
+httpx==0.28.1
