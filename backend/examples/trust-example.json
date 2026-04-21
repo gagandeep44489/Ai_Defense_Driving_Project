@@ -1,0 +1,32 @@
+{
+  "input": {
+    "logs": [
+      {
+        "agentId": "agent-fin-1",
+        "actionType": "policy_validation",
+        "timestamp": 1760000000000,
+        "metadata": { "approved": true, "violated": false, "anomalyFlag": false }
+      },
+      {
+        "agentId": "agent-fin-1",
+        "actionType": "transfer_attempt",
+        "timestamp": 1760000100000,
+        "metadata": { "approved": false, "violated": true, "anomalyFlag": true }
+      }
+    ],
+    "options": { "peerInfluenceScore": 0.64 }
+  },
+  "output": {
+    "trustScore": 30,
+    "riskLevel": "CRITICAL",
+    "features": {
+      "request_rate": 0.0005555555555555556,
+      "success_rate": 0.5,
+      "violation_rate": 0.5,
+      "anomaly_score": 0.5,
+      "consistency_score": 0.5,
+      "decay_factor": 1,
+      "peer_influence_score": 0.64
+    }
+  }
+}
