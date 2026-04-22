@@ -1,0 +1,139 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  color: #e6edf7;
+  background: #070b14;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #1f2a44 0%, #070b14 45%);
+}
+
+.dashboard {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+header p {
+  color: #b4bfd1;
+  margin-top: 0.6rem;
+}
+
+.input-form {
+  display: flex;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+
+.input-form input {
+  flex: 1;
+  border: 1px solid #33446b;
+  border-radius: 10px;
+  padding: 0.9rem;
+  background: #11182a;
+  color: #e6edf7;
+}
+
+.input-form button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.9rem 1.2rem;
+  background: linear-gradient(120deg, #4f7bff, #5ad9ff);
+  color: #071022;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.score-card,
+.breakdown-card,
+.insights-list {
+  background: rgba(17, 24, 42, 0.9);
+  border: 1px solid #27375f;
+  border-radius: 14px;
+}
+
+.score-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem;
+  margin-bottom: 1.1rem;
+}
+
+.score-value {
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.risk-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.risk-badge.safe { background: #19381f; color: #94f7aa; }
+.risk-badge.moderate { background: #3c3117; color: #ffd47f; }
+.risk-badge.risky { background: #471d22; color: #ff9aa7; }
+
+.explanation {
+  max-width: 420px;
+  color: #b4bfd1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.breakdown-card {
+  padding: 1rem;
+}
+
+.breakdown-card p {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0.45rem 0;
+}
+
+.bar-bg {
+  background: #23355f;
+  border-radius: 999px;
+  height: 8px;
+}
+
+.bar-fill {
+  background: linear-gradient(120deg, #4f7bff, #5ad9ff);
+  border-radius: inherit;
+  height: 100%;
+}
+
+.insights-list {
+  margin-top: 1.1rem;
+  padding: 1rem 1.2rem 1rem 2rem;
+}
+
+.insights-list li + li {
+  margin-top: 0.55rem;
+}
+
+.error {
+  color: #ff9aa7;
+  margin-bottom: 1rem;
+}
