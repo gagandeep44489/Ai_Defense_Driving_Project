@@ -1,0 +1,11 @@
+pandas
+numpy
+scikit-learn
+xgboost
+fastapi
+uvicorn
+streamlit
+requests
+networkx
+shap
+matplotlib
