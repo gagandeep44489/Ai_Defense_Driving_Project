@@ -1,0 +1,7 @@
+simulation_iterations: 500
+var_percentile: 95
+scenarios:
+  base: 1.0
+  recession: 1.35
+  growth: 0.85
+  inflation_shock: 1.2
