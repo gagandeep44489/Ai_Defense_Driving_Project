@@ -1,0 +1,3 @@
+import { Shell } from "@/components/Shell";
+const actions = ["Finalize roadmap follow-up", "Complete vendor risk review", "Send customer launch timeline"];
+export default function ActionsPage() { return <Shell><h2 className="text-3xl font-bold">Action Items</h2><div className="mt-6 grid gap-4">{actions.map((action, index) => <div className="rounded-2xl bg-white p-5 shadow-enterprise" key={action}><div className="flex justify-between"><p className="font-semibold">{action}</p><span className="text-sm text-slate-500">Owner {index + 1}</span></div><p className="mt-2 text-sm text-rose-600">Deadline detected automatically</p></div>)}</div></Shell>; }

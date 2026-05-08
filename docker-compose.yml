@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: meeting_brain
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports: ["5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+  api:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/meeting_brain
+      JWT_SECRET_KEY: change-me
+      VECTOR_STORE_PATH: /data/chroma
+      UPLOAD_DIR: /data/uploads
+    ports: ["8000:8000"]
+    depends_on: [db]
+    volumes: ["meeting_data:/data"]
+  web:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+      PORT: 3002
+    ports: ["3002:3002"]
+    depends_on: [api]
+volumes:
+  postgres_data:
+  meeting_data:
