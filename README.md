@@ -58,7 +58,7 @@ docker compose up --build
 
 3. Open services:
 
-- Frontend: <http://localhost:3000>
+- Frontend: <http://localhost:3002>
 - API: <http://localhost:8000>
 - OpenAPI: <http://localhost:8000/docs>
 
