@@ -1,0 +1,29 @@
+name: CI
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - run: cd apps/api && pip install -e '.[dev]'
+      - run: cd apps/api && pytest
+      - run: cd apps/api && ruff check app tests
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '24', cache: 'npm', cache-dependency-path: apps/web/package-lock.json }
+      - run: cd apps/web && npm install
+      - run: cd apps/web && npm test
+      - run: cd apps/web && npm run build
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker compose config

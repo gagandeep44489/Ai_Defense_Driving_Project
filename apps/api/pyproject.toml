@@ -1,0 +1,37 @@
+[project]
+name = "skill-gap-api"
+version = "0.1.0"
+description = "Enterprise Skill Gap Identifier FastAPI service"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.34.0",
+  "pydantic>=2.10.0",
+  "pydantic-settings>=2.8.0",
+  "sqlalchemy[asyncio]>=2.0.38",
+  "asyncpg>=0.30.0",
+  "alembic>=1.14.0",
+  "python-jose[cryptography]>=3.4.0",
+  "passlib[bcrypt]>=1.7.4",
+  "python-multipart>=0.0.20",
+  "email-validator>=2.2.0",
+  "aiosqlite>=0.21.0",
+  "redis>=5.2.0",
+  "celery>=5.4.0",
+  "sentence-transformers>=3.4.0",
+  "scikit-learn>=1.6.0",
+  "langchain>=0.3.0",
+  "langchain-openai>=0.3.0",
+  "pypdf>=5.3.0",
+  "python-docx>=1.1.2",
+  "structlog>=25.1.0",
+  "slowapi>=0.1.9"
+]
+[project.optional-dependencies]
+dev = ["pytest>=8.3.0", "pytest-asyncio>=0.25.0", "httpx>=0.28.0", "ruff>=0.11.0", "mypy>=1.15.0"]
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
