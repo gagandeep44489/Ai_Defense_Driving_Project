@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root { --background: 220 33% 98%; --foreground: 222 47% 11%; --primary: 246 83% 60%; --primary-foreground: 0 0% 100%; --muted: 220 14% 92%; --border: 220 13% 87%; }
+.dark { --background: 222 47% 7%; --foreground: 210 40% 98%; --primary: 263 90% 66%; --primary-foreground: 0 0% 100%; --muted: 217 33% 17%; --border: 217 33% 20%; }
+body { @apply bg-background text-foreground antialiased; }
+.card { @apply rounded-2xl border border-border bg-white/75 p-6 shadow-sm backdrop-blur dark:bg-slate-900/75; }
