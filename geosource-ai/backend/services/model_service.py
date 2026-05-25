@@ -37,8 +37,7 @@ class ModelService:
     def predict(self, payload: dict[str, Any], headlines: list[str]) -> dict[str, Any]:
         try:
             df = pd.DataFrame([payload])
-            x = self.preprocessor.transform(df)
-            probs = self.model.predict_proba(x)[0]
+            probs = self.model.predict_proba(df)[0]
             pred_idx = int(probs.argmax())
             risk_label = str(self.label_encoder.inverse_transform([pred_idx])[0])
         except Exception as exc:  # noqa: BLE001
