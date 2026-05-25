@@ -9,8 +9,9 @@ class Settings(BaseSettings):
     data_path: str = "data/processed/suppliers.csv"
     model_path: str = "models/risk_model.joblib"
     preprocessor_path: str = "models/preprocessor.joblib"
+    label_encoder_path: str = "models/label_encoder.joblib"
     graph_path: str = "models/supplier_graph.joblib"
-    model_version: str = "1.0.0"
+    model_version: str = "1.1.0"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends
+"""API routes for GeoSource AI."""
+from fastapi import APIRouter, Depends, HTTPException
 
 from backend.core.config import settings
 from backend.schemas.supplier import PredictRequest, PredictResponse, RecommendRequest, RecommendResponse
@@ -9,7 +10,10 @@ router = APIRouter()
 
 
 def get_model_service() -> ModelService:
-    return ModelService(settings.model_path, settings.preprocessor_path)
+    try:
+        return ModelService(settings.model_path, settings.preprocessor_path, settings.label_encoder_path)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 def get_graph_service() -> GraphService:

@@ -1,3 +1,6 @@
+"""API schemas for supplier workflows."""
+from __future__ import annotations
+
 from typing import Dict, List
 
 from pydantic import BaseModel, Field
@@ -15,13 +18,20 @@ class SupplierFeatures(BaseModel):
 
 class PredictRequest(BaseModel):
     supplier: SupplierFeatures
-    headlines: List[str] = []
+    headlines: List[str] = Field(default_factory=list)
+
+
+class NLPSignal(BaseModel):
+    sentiment: float
+    risk_adjustment: float
+    summary: str
 
 
 class PredictResponse(BaseModel):
     risk_level: str
     confidence: float
     risk_score: float
+    nlp_signal: NLPSignal
     explanation: Dict[str, List[Dict[str, float | str]]]
 
 
