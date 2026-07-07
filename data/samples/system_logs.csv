@@ -1,0 +1,2 @@
+timestamp,entity,event,severity,label
+2026-01-01T00:00:00Z,synthetic,baseline,low,benign
