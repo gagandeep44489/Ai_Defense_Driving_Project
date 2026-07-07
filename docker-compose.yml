@@ -1,0 +1,23 @@
+services:
+  api:
+    build: .
+    env_file: .env.example
+    ports: ["8000:8000"]
+    depends_on: [postgres, redis]
+  dashboard:
+    build: .
+    command: streamlit run src/sovereignai/dashboard/app.py --server.address 0.0.0.0
+    ports: ["8501:8501"]
+  postgres:
+    image: postgres:16
+    environment: {POSTGRES_USER: sovereignai, POSTGRES_PASSWORD: sovereignai, POSTGRES_DB: sovereignai}
+    ports: ["5432:5432"]
+  redis:
+    image: redis:7-alpine
+  prometheus:
+    image: prom/prometheus
+    volumes: ["./configs/prometheus:/etc/prometheus"]
+    ports: ["9090:9090"]
+  grafana:
+    image: grafana/grafana
+    ports: ["3000:3000"]

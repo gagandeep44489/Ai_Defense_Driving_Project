@@ -1,0 +1,6 @@
+name: Feature request
+description: Propose a capability
+body:
+  - type: textarea
+    id: value
+    attributes: {label: Mission value}
