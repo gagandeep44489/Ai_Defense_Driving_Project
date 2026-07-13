@@ -1,0 +1,2 @@
+import { Card, CardContent, Typography } from '@mui/material';
+export function MetricCard({ title, value, helper }: { title: string; value: string | number; helper?: string }) { return <Card sx={{ height: '100%' }}><CardContent><Typography color="text.secondary" variant="body2">{title}</Typography><Typography variant="h4" sx={{ my: 1 }}>{value}</Typography>{helper && <Typography variant="caption">{helper}</Typography>}</CardContent></Card>; }
