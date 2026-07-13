@@ -1,0 +1,10 @@
+import { createBrowserRouter } from 'react-router-dom';
+import { AppLayout } from '../components/layout/AppLayout';
+import { AnalyticsPage } from '../pages/AnalyticsPage';
+import { HealthPage } from '../pages/HealthPage';
+import { HomePage } from '../pages/HomePage';
+import { MapPage } from '../pages/MapPage';
+import { MetricsPage } from '../pages/MetricsPage';
+import { NotFoundPage } from '../pages/NotFoundPage';
+import { RecommendationPage } from '../pages/RecommendationPage';
+export const createAppRouter = (toggleTheme: () => void) => createBrowserRouter([{ element: <AppLayout toggleTheme={toggleTheme} />, children: [{ path: '/', element: <HomePage /> }, { path: '/recommendations', element: <RecommendationPage /> }, { path: '/map', element: <MapPage /> }, { path: '/analytics', element: <AnalyticsPage /> }, { path: '/health', element: <HealthPage /> }, { path: '/metrics', element: <MetricsPage /> }, { path: '*', element: <NotFoundPage /> }] }]);

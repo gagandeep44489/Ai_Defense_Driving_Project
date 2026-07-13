@@ -1,0 +1,2 @@
+import { createTheme } from '@mui/material/styles';
+export const createClimateTheme = (mode: 'light' | 'dark') => createTheme({ palette: { mode, primary: { main: '#0f766e' }, secondary: { main: '#0284c7' }, background: { default: mode === 'light' ? '#f8fafc' : '#0f172a' } }, shape: { borderRadius: 14 }, typography: { fontFamily: 'Inter, system-ui, sans-serif', h4: { fontWeight: 800 }, h5: { fontWeight: 700 } } });
