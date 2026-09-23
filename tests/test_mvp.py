@@ -26,3 +26,11 @@ def test_workflow_aggregates_completed_tasks():
  for task in w.tasks:
   task.transition(TaskStatus.READY); task.transition(TaskStatus.IN_PROGRESS); task.transition(TaskStatus.COMPLETED)
  assert w.status == TaskStatus.COMPLETED
+
+def test_list_tasks_returns_task_dtos_for_an_existing_workflow():
+ pytest.importorskip("fastapi")
+ from uae_navigator import api
+ event=api.service.report("api-resident","baby born",date(2026,1,1))
+ workflow=api.service.analyze(event.id)
+
+ assert api.list_tasks(workflow.id) == api.workflow_dto(workflow)["tasks"]

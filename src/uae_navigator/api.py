@@ -40,7 +40,7 @@ def get_workflow(workflow_id:str):
  if not w: raise NotFound("Workflow not found")
  return workflow_dto(w)
 @app.get("/api/v1/workflows/{workflow_id}/tasks")
-def list_tasks(workflow_id:str): return workflow_dto(get_workflow(workflow_id))["tasks"]
+def list_tasks(workflow_id:str): return get_workflow(workflow_id)["tasks"]
 @app.get("/api/v1/life-events/{event_id}/notifications")
 def notifications(event_id:str):
  if not store.events.get(event_id): raise NotFound("Life event not found")
