@@ -1,0 +1,2 @@
+# Security and privacy
+No secrets are committed. Keep PII out of logs and minimize extracted attributes. The API's authentication boundary is intentionally a deployment integration point: production needs authenticated resident identity, per-resource authorization, TLS, encryption, rate limits, encrypted protected audit retention, consent recording, and UAE legal/compliance review. Mock integrations must never be presented as submissions.
