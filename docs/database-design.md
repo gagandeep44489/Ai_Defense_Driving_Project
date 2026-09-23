@@ -1,0 +1,2 @@
+# Database design
+Production relational tables: `residents`, `life_events`, `workflows`, `workflow_tasks`, `government_services`, `document_requirements`, `documents`, `notifications`, and `audit_events`. Foreign keys: events→residents, workflows→events, tasks→workflows, documents→tasks, audits→entity. Index event resident/type/date uniquely for deduplication, plus workflow/event and task/status indexes. Attributes may be JSONB; relationships must remain normalized.

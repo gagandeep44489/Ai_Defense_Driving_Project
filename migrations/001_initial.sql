@@ -1,0 +1,11 @@
+-- PostgreSQL production schema. The running MVP uses in-memory repositories.
+CREATE TABLE residents (id UUID PRIMARY KEY, external_subject VARCHAR(128) UNIQUE NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE life_events (id UUID PRIMARY KEY, resident_id UUID NOT NULL REFERENCES residents(id), event_type VARCHAR(32) NOT NULL, event_date DATE NOT NULL, attributes JSONB NOT NULL DEFAULT '{}', confidence NUMERIC(4,3), status VARCHAR(32) NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now(), UNIQUE(resident_id,event_type,event_date));
+CREATE TABLE workflows (id UUID PRIMARY KEY, life_event_id UUID NOT NULL UNIQUE REFERENCES life_events(id), confirmed_at TIMESTAMPTZ, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE government_services (id VARCHAR(80) PRIMARY KEY, name TEXT NOT NULL, provider VARCHAR(80) NOT NULL);
+CREATE TABLE workflow_tasks (id UUID PRIMARY KEY, workflow_id UUID NOT NULL REFERENCES workflows(id), government_service_id VARCHAR(80) REFERENCES government_services(id), title TEXT NOT NULL, description TEXT NOT NULL, status VARCHAR(32) NOT NULL, priority SMALLINT NOT NULL, due_date DATE, external_reference_id VARCHAR(160), created_at TIMESTAMPTZ NOT NULL DEFAULT now(), updated_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE INDEX workflow_tasks_workflow_status_idx ON workflow_tasks(workflow_id,status);
+CREATE TABLE document_requirements (id UUID PRIMARY KEY, task_id UUID NOT NULL REFERENCES workflow_tasks(id), name TEXT NOT NULL, required BOOLEAN NOT NULL DEFAULT true);
+CREATE TABLE documents (id UUID PRIMARY KEY, task_id UUID NOT NULL REFERENCES workflow_tasks(id), requirement_id UUID REFERENCES document_requirements(id), storage_reference TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE notifications (id UUID PRIMARY KEY, resident_id UUID NOT NULL REFERENCES residents(id), life_event_id UUID REFERENCES life_events(id), channel VARCHAR(30) NOT NULL, status VARCHAR(30) NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE audit_events (id UUID PRIMARY KEY, actor VARCHAR(128) NOT NULL, action VARCHAR(80) NOT NULL, entity_type VARCHAR(80) NOT NULL, entity_id UUID NOT NULL, metadata JSONB NOT NULL DEFAULT '{}', occurred_at TIMESTAMPTZ NOT NULL DEFAULT now());

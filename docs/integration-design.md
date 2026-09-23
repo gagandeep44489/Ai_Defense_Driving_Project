@@ -1,0 +1,2 @@
+# Integration design
+`GovernmentServiceProvider` is an adapter boundary. The active `MockGovernmentProvider` returns synthetic `MOCK-*` references only and cannot call any government service. Real Emirates ID, residency, or birth adapters must implement the same focused port, obtain secure credentials from runtime configuration, and preserve confirmation, audit, retry, and status polling controls.
